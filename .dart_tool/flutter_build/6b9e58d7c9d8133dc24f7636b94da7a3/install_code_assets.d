@@ -1,1 +1,0 @@
- /home/pizi/Documents/Projects/flutter_scrcpygui_companion/.dart_tool/flutter_build/6b9e58d7c9d8133dc24f7636b94da7a3/native_assets.json: 
