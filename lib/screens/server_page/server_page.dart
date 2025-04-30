@@ -1,10 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrcpygui_companion/models/adb_devices.dart';
-import 'package:scrcpygui_companion/models/scrcpy_config.dart';
 import 'package:scrcpygui_companion/utils/api_utils.dart';
 import 'package:string_extensions/string_extensions.dart';
 
+import '../../provider/data_provider.dart';
 import '../../provider/server_provider.dart';
 import '../device_page/device_page.dart';
 
@@ -19,8 +23,6 @@ class ServerPage extends ConsumerStatefulWidget {
 
 class _ServerPageState extends ConsumerState<ServerPage> {
   bool loading = false;
-  List<AdbDevices> devices = [];
-  List<ScrcpyConfig> configs = [];
 
   @override
   void initState() {
@@ -33,6 +35,7 @@ class _ServerPageState extends ConsumerState<ServerPage> {
   @override
   Widget build(BuildContext context) {
     final server = ref.watch(serverProvider);
+    final devices = ref.watch(devicesProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -72,10 +75,55 @@ class _ServerPageState extends ConsumerState<ServerPage> {
     setState(() => loading = true);
 
     try {
-      devices = await ApiUtils.getDevices(server);
-      configs = await ApiUtils.getConfigs(server);
+      ref.read(devicesProvider.notifier).state = await ApiUtils.getDevices(
+        server,
+      );
+    } on SocketException catch (e) {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: Text('Error'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 8,
+                children: [
+                  Text('Make sure companion server is started on Scrcpy GUI'),
+                  Text('Error: ${e.message}'),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed:
+                      () =>
+                          Navigator.popUntil(context, (route) => route.isFirst),
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+      );
     } catch (e) {
-      debugPrint(e.toString());
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: Text('Error'),
+              content: Text(e.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+      );
     } finally {
       setState(() => loading = false);
     }
