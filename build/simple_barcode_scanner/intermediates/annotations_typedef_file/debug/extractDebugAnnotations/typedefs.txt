@@ -1,2 +1,0 @@
-D com/amolg/flutterbarcodescanner/camera/CameraSource$FlashMode
-D com/amolg/flutterbarcodescanner/camera/CameraSource$FocusMode
