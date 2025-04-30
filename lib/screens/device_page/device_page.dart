@@ -4,9 +4,11 @@ import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrcpygui_companion/models/adb_devices.dart';
+import 'package:scrcpygui_companion/models/app_config_pair.dart';
 import 'package:scrcpygui_companion/models/scrcpy_config.dart';
 import 'package:scrcpygui_companion/models/scrcpy_instance.dart';
 import 'package:scrcpygui_companion/models/server_model.dart';
+import 'package:scrcpygui_companion/provider/data_provider.dart';
 import 'package:scrcpygui_companion/utils/api_utils.dart';
 
 import '../../provider/server_provider.dart';
@@ -22,11 +24,39 @@ class DevicePage extends ConsumerStatefulWidget {
 class _DevicePageState extends ConsumerState<DevicePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool loading = false;
 
   @override
   void initState() {
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
     super.initState();
+  }
+
+  _refreshData() async {
+    try {
+      setState(() => loading = true);
+      final server = ref.read(serverProvider)!;
+      final device = widget.device;
+
+      switch (_tabController.index) {
+        case 0:
+          ref
+              .read(pinnedAppProvider.notifier)
+              .state = await ApiUtils.getPinnedApps(server, device);
+          break;
+        case 1:
+          ref.read(configsProvider.notifier).state = await ApiUtils.getConfigs(
+            server,
+          );
+          break;
+
+        default:
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    } finally {
+      setState(() => loading = false);
+    }
   }
 
   @override
@@ -39,17 +69,34 @@ class _DevicePageState extends ConsumerState<DevicePage>
         bottom: TabBar(
           controller: _tabController,
           tabs: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Pinned apps'),
+            ),
             Padding(padding: const EdgeInsets.all(8.0), child: Text('Configs')),
             Padding(padding: const EdgeInsets.all(8.0), child: Text('Running')),
           ],
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.refresh_rounded)),
+          IconButton(
+            onPressed: loading ? null : _refreshData,
+            icon:
+                loading
+                    ? SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(),
+                    )
+                    : Icon(Icons.refresh_rounded),
+          ),
         ],
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
+          Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: PinnedAppsTab(device: device),
+          ),
           Padding(
             padding: EdgeInsets.only(top: 4),
             child: ConfigTab(device: device),
@@ -64,40 +111,137 @@ class _DevicePageState extends ConsumerState<DevicePage>
   }
 }
 
-class ConfigTab extends ConsumerWidget {
+class ConfigTab extends ConsumerStatefulWidget {
   final AdbDevices device;
   const ConfigTab({super.key, required this.device});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConfigTab> createState() => _ConfigTabState();
+}
+
+class _ConfigTabState extends ConsumerState<ConfigTab> {
+  bool loading = false;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getConfigs();
+    });
+  }
+
+  _getConfigs() async {
+    setState(() => loading = true);
+    ref.read(configsProvider.notifier).state = await ApiUtils.getConfigs(
+      ref.read(serverProvider)!,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final server = ref.watch(serverProvider)!;
+    final configs = ref.watch(configsProvider);
 
-    return FutureBuilder(
-      future: ApiUtils.getConfigs(server),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        }
+    return ListView.builder(
+      itemCount: configs.length,
+      itemBuilder: (context, index) {
+        final config = configs[index];
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final configs = snapshot.data!;
-
-        return ListView.builder(
-          itemCount: configs.length,
-          itemBuilder: (context, index) {
-            final config = configs[index];
-
-            return ConfigListTile(
-              config: config,
-              server: server,
-              device: device,
-            );
-          },
+        return ConfigListTile(
+          config: config,
+          server: server,
+          device: widget.device,
         );
       },
+    );
+  }
+}
+
+class PinnedAppsTab extends ConsumerStatefulWidget {
+  final AdbDevices device;
+  const PinnedAppsTab({super.key, required this.device});
+
+  @override
+  ConsumerState<PinnedAppsTab> createState() => _PinnedAppsTabState();
+}
+
+class _PinnedAppsTabState extends ConsumerState<PinnedAppsTab> {
+  bool loading = false;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getPinnedApps();
+    });
+  }
+
+  _getPinnedApps() async {
+    setState(() => loading = true);
+    ref.read(pinnedAppProvider.notifier).state = await ApiUtils.getPinnedApps(
+      ref.read(serverProvider)!,
+      widget.device,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final server = ref.watch(serverProvider);
+    final List<AppConfigPair> pinnedApps = ref.watch(pinnedAppProvider);
+
+    return ListView.builder(
+      itemCount: pinnedApps.length,
+      itemBuilder: (context, index) {
+        final pinned = pinnedApps[index];
+
+        return PinnedAppsListTile(server: server!, pinned: pinned);
+      },
+    );
+  }
+}
+
+class PinnedAppsListTile extends StatefulWidget {
+  final ServerModel server;
+  final AppConfigPair pinned;
+  const PinnedAppsListTile({
+    super.key,
+    required this.pinned,
+    required this.server,
+  });
+
+  @override
+  State<PinnedAppsListTile> createState() => _PinnedAppsListTileState();
+}
+
+class _PinnedAppsListTileState extends State<PinnedAppsListTile> {
+  bool loading = false;
+
+  _start() async {
+    setState(() => loading = true);
+    try {
+      await ApiUtils.startPinnedApp(widget.server, widget.pinned);
+    } finally {
+      setState(() => loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: ListTile(
+        title: Text(widget.pinned.app.name),
+        subtitle: Text('On: ${widget.pinned.config.configName}'),
+        trailing: IconButton(
+          onPressed: _start,
+          icon:
+              loading
+                  ? SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(),
+                  )
+                  : Icon(Icons.play_arrow_rounded),
+        ),
+      ),
     );
   }
 }
