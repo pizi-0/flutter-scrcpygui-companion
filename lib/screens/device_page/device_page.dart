@@ -10,8 +10,11 @@ import 'package:scrcpygui_companion/models/scrcpy_instance.dart';
 import 'package:scrcpygui_companion/models/server_model.dart';
 import 'package:scrcpygui_companion/provider/data_provider.dart';
 import 'package:scrcpygui_companion/utils/api_utils.dart';
+import 'package:string_extensions/string_extensions.dart';
 
 import '../../provider/server_provider.dart';
+
+const String _adbMdns = '_adb-tls-connect._tcp';
 
 class DevicePage extends ConsumerStatefulWidget {
   final AdbDevices device;
@@ -62,10 +65,34 @@ class _DevicePageState extends ConsumerState<DevicePage>
   @override
   Widget build(BuildContext context) {
     final device = widget.device;
+    final isWireless = device.id.contains(_adbMdns) || device.id.isIpv4;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(device.name ?? device.modelName),
+        title: ListTile(
+          title: Row(
+            spacing: 8,
+            children: [
+              Icon(
+                isWireless ? Icons.wifi_rounded : Icons.usb_rounded,
+                size: 18,
+              ),
+              Expanded(
+                child: Text(
+                  device.name ?? device.modelName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          subtitle: Text(
+            device.id,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ).fontSize(12),
+          contentPadding: EdgeInsets.zero,
+        ),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -230,7 +257,7 @@ class _PinnedAppsListTileState extends State<PinnedAppsListTile> {
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
         title: Text(widget.pinned.app.name),
-        subtitle: Text('On: ${widget.pinned.config.configName}'),
+        subtitle: Text('On: ${widget.pinned.config.configName}').fontSize(12),
         trailing: IconButton(
           onPressed: _start,
           icon:

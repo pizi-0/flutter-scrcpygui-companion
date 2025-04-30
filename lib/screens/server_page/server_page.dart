@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrcpygui_companion/models/adb_devices.dart';
@@ -39,7 +40,11 @@ class _ServerPageState extends ConsumerState<ServerPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(server?.name ?? ''),
+        title: ListTile(
+          title: Text(server!.name),
+          subtitle: Text('${server.endpoint}:${server.port}').fontSize(12),
+          contentPadding: EdgeInsets.zero,
+        ),
         actions: [
           IconButton(onPressed: _getData, icon: Icon(Icons.refresh_rounded)),
         ],
@@ -151,7 +156,11 @@ class DeviceListTile extends StatelessWidget {
         leading:
             isWireless ? Icon(Icons.wifi_rounded) : Icon(Icons.usb_rounded),
         title: Text(d.name ?? d.modelName),
-        subtitle: Text(d.id, maxLines: 1, overflow: TextOverflow.ellipsis),
+        subtitle: Text(
+          d.id,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ).fontSize(12),
       ),
     );
   }

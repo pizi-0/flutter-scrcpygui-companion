@@ -204,7 +204,9 @@ class _ServerListTileState extends ConsumerState<ServerListTile>
         ),
         child: ListTile(
           title: Text(widget.serv.name),
-          subtitle: Text('${widget.serv.endpoint}:${widget.serv.port}'),
+          subtitle: Text(
+            '${widget.serv.endpoint}:${widget.serv.port}',
+          ).fontSize(12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
