@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:awesome_extensions/awesome_extensions_flutter.dart';
+import 'package:encrypt_decrypt_plus/encrypt_decrypt/xor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrcpygui_companion/provider/server_provider.dart';
@@ -99,7 +100,9 @@ class _MainPageState extends ConsumerState<MainPage> {
           return;
         }
 
-        final server = ServerModel.fromJson(res);
+        final decode = XOR().xorDecode(res);
+
+        final server = ServerModel.fromJson(decode);
 
         showDialog(
           context: context,
