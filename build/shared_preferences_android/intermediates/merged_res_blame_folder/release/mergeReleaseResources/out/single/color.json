@@ -1,0 +1,82 @@
+[
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_background_cache_hint_selector_material_dark.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_background_cache_hint_selector_material_dark.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_tint_btn_checkable.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_tint_btn_checkable.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_primary_text_disable_only_material_light.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_primary_text_disable_only_material_light.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/switch_thumb_material_dark.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/switch_thumb_material_dark.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_secondary_text_material_light.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_secondary_text_material_light.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_primary_text_disable_only_material_dark.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_primary_text_disable_only_material_dark.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_hint_foreground_material_dark.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_hint_foreground_material_dark.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_tint_default.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_tint_default.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_primary_text_material_dark.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_primary_text_material_dark.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_secondary_text_material_dark.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_secondary_text_material_dark.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_tint_spinner.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_tint_spinner.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_tint_edittext.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_tint_edittext.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_search_url_text.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_search_url_text.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_tint_seek_thumb.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_tint_seek_thumb.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_btn_colored_text_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_btn_colored_text_material.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_tint_switch_track.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_tint_switch_track.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_hint_foreground_material_light.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_hint_foreground_material_light.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/switch_thumb_material_light.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/switch_thumb_material_light.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_primary_text_material_light.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_primary_text_material_light.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color/abc_background_cache_hint_selector_material_light.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color/abc_background_cache_hint_selector_material_light.xml"
+    }
+]

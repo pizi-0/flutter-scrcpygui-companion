@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout-v21/notification_template_icon_group.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout-v21/notification_template_icon_group.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout-v21/notification_action.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout-v21/notification_action.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout-v21/notification_template_custom_big.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout-v21/notification_template_custom_big.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout-v21/notification_action_tombstone.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout-v21/notification_action_tombstone.xml"
+    }
+]

@@ -1,0 +1,27 @@
+R_DEF: Internal format may change without notice
+local
+dimen activity_horizontal_margin
+dimen activity_vertical_margin
+drawable ic_barcode_flash_off
+drawable ic_barcode_flash_on
+drawable ic_switch_camera
+id btnBarcodeCaptureCancel
+id graphicOverlay
+id imgViewBarcodeCaptureUseFlash
+id imgViewSwitchCamera
+id layoutBottom
+id preview
+id topLayout
+layout barcode_capture
+string auto_focus
+string barcode_error
+string barcode_failure
+string barcode_header
+string barcode_success
+string low_storage_error
+string no_camera_permission
+string ok
+string permission_camera_rationale
+string read_barcode
+string title_activity_main
+string use_flash

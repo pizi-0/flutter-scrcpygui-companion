@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-release-38:/values-v18/values-v18.xml",
+            "map": [
+                {
+                    "source": "/home/pizi/.gradle/caches/8.10.2/transforms/21f508358b7ef6793f647ddb068091fd/transformed/appcompat-1.2.0/res/values-v18/values-v18.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "48",
+                        "endOffsets": "99"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-mergeReleaseResources-36:/values-v18/values-v18.xml",
+            "map": [
+                {
+                    "source": "/home/pizi/.gradle/caches/8.10.2/transforms/21f508358b7ef6793f647ddb068091fd/transformed/appcompat-1.2.0/res/values-v18/values-v18.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "48",
+                        "endOffsets": "99"
+                    }
+                }
+            ]
+        }
+    ]
+}

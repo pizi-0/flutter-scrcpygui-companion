@@ -1,0 +1,26 @@
+[
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/drawable-ldpi-v4/ic_call_answer.png",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/drawable-ldpi-v4/ic_call_answer.png"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/drawable-ldpi-v4/ic_call_decline.png",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/drawable-ldpi-v4/ic_call_decline.png"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/drawable-ldpi-v4/ic_call_answer_video_low.png",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/drawable-ldpi-v4/ic_call_answer_video_low.png"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/drawable-ldpi-v4/ic_call_answer_video.png",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/drawable-ldpi-v4/ic_call_answer_video.png"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/drawable-ldpi-v4/ic_call_decline_low.png",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/drawable-ldpi-v4/ic_call_decline_low.png"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/drawable-ldpi-v4/ic_call_answer_low.png",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/drawable-ldpi-v4/ic_call_answer_low.png"
+    }
+]

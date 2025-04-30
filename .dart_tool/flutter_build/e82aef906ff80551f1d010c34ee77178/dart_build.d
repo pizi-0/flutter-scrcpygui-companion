@@ -1,0 +1,1 @@
+ /home/pizi/Documents/Projects/flutter_scrcpygui_companion/.dart_tool/flutter_build/e82aef906ff80551f1d010c34ee77178/dart_build_result.json: 

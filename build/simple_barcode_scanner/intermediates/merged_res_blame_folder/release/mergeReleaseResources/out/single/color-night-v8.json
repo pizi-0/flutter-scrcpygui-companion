@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-release-38:/color-night-v8/material_timepicker_button_stroke.xml",
+        "source": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-material-1.3.0-3:/color-night-v8/material_timepicker_button_stroke.xml"
+    },
+    {
+        "merged": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-release-38:/color-night-v8/material_timepicker_modebutton_tint.xml",
+        "source": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-material-1.3.0-3:/color-night-v8/material_timepicker_modebutton_tint.xml"
+    },
+    {
+        "merged": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-release-38:/color-night-v8/material_timepicker_clockface.xml",
+        "source": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-material-1.3.0-3:/color-night-v8/material_timepicker_clockface.xml"
+    }
+]

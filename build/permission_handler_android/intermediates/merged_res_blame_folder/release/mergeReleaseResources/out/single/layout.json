@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/notification_action.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/notification_action.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/notification_template_icon_group.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/notification_template_icon_group.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/notification_template_part_chronometer.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/notification_template_part_chronometer.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/notification_template_part_time.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/notification_template_part_time.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/custom_dialog.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/custom_dialog.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/ime_secondary_split_test_activity.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/ime_secondary_split_test_activity.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/notification_action_tombstone.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/notification_action_tombstone.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/ime_base_split_test_activity.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/ime_base_split_test_activity.xml"
+    },
+    {
+        "merged": "com.baseflow.permissionhandler.permission_handler_android-release-25:/layout/notification_template_custom_big.xml",
+        "source": "com.baseflow.permissionhandler.permission_handler_android-core-1.13.1-8:/layout/notification_template_custom_big.xml"
+    }
+]

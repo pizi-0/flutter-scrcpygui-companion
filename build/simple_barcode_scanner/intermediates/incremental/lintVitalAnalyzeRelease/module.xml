@@ -1,0 +1,26 @@
+<lint-module
+    format="1"
+    dir="/home/pizi/.pub-cache/hosted/pub.dev/simple_barcode_scanner-0.3.0/android"
+    name=":simple_barcode_scanner"
+    type="LIBRARY"
+    maven="com.amolg.flutterbarcodescanner:simple_barcode_scanner:1.0-SNAPSHOT"
+    agpVersion="8.7.0"
+    buildFolder="/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/simple_barcode_scanner"
+    bootClassPath="/home/pizi/Android/Sdk/platforms/android-34/android.jar:/home/pizi/Android/Sdk/build-tools/34.0.0/core-lambda-stubs.jar"
+    javaSourceLevel="1.8"
+    compileTarget="android-34"
+    neverShrinking="true">
+  <lintOptions
+      disable="InvalidPackage"
+      abortOnError="true"
+      absolutePaths="true"
+      checkReleaseBuilds="true"
+      explainIssues="true">
+    <severities>
+      <severity
+        id="InvalidPackage"
+        severity="IGNORE" />
+    </severities>
+  </lintOptions>
+  <variant name="release"/>
+</lint-module>

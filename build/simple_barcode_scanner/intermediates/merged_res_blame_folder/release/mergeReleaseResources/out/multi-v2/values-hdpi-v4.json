@@ -1,0 +1,36 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-mergeReleaseResources-36:/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "/home/pizi/.gradle/caches/8.10.2/transforms/21f508358b7ef6793f647ddb068091fd/transformed/appcompat-1.2.0/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "com.amolg.flutterbarcodescanner.simple_barcode_scanner-release-38:/values-hdpi-v4/values-hdpi-v4.xml",
+            "map": [
+                {
+                    "source": "/home/pizi/.gradle/caches/8.10.2/transforms/21f508358b7ef6793f647ddb068091fd/transformed/appcompat-1.2.0/res/values-hdpi-v4/values-hdpi-v4.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "6",
+                        "endColumns": "13",
+                        "endOffsets": "327"
+                    }
+                }
+            ]
+        }
+    ]
+}

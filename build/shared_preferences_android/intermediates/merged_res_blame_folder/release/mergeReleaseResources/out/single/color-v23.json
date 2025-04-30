@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_color_highlight_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_color_highlight_material.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_tint_spinner.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_tint_spinner.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_tint_switch_track.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_tint_switch_track.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_tint_btn_checkable.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_tint_btn_checkable.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_tint_default.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_tint_default.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_btn_colored_text_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_btn_colored_text_material.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_tint_seek_thumb.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_tint_seek_thumb.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_btn_colored_borderless_text_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_btn_colored_borderless_text_material.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/color-v23/abc_tint_edittext.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/color-v23/abc_tint_edittext.xml"
+    }
+]

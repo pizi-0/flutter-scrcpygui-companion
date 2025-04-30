@@ -1,0 +1,4 @@
+#Wed Apr 30 07:39:49 MYT 2025
+base.0=/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/app/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

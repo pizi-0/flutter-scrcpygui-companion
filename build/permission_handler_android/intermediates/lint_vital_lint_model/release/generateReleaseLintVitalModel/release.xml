@@ -1,0 +1,31 @@
+<variant
+    name="release"
+    package="com.baseflow.permissionhandler"
+    minSdkVersion="19"
+    targetSdkVersion="19"
+    mergedManifest="/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/permission_handler_android/intermediates/merged_manifest/release/processReleaseManifest/AndroidManifest.xml"
+    manifestMergeReport="/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/permission_handler_android/outputs/logs/manifest-merger-release-report.txt"
+    proguardFiles="/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/permission_handler_android/intermediates/default_proguard_files/global/proguard-android.txt-8.7.0"
+    partialResultsDir="/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/permission_handler_android/intermediates/lint_vital_partial_results/release/lintVitalAnalyzeRelease/out">
+  <buildFeatures
+      namespacing="REQUIRED"/>
+  <sourceProviders>
+    <sourceProvider
+        manifests="src/main/AndroidManifest.xml"
+        javaDirectories="src/main/java:src/release/java:src/main/kotlin:src/release/kotlin"
+        resDirectories="src/main/res:src/release/res"
+        assetsDirectories="src/main/assets:src/release/assets"/>
+  </sourceProviders>
+  <testSourceProviders>
+  </testSourceProviders>
+  <testFixturesSourceProviders>
+  </testFixturesSourceProviders>
+  <artifact
+      classOutputs="/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/permission_handler_android/intermediates/javac/release/compileReleaseJavaWithJavac/classes:/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/permission_handler_android/intermediates/compile_r_class_jar/release/generateReleaseRFile/R.jar"
+      type="MAIN"
+      applicationId="com.baseflow.permissionhandler"
+      generatedSourceFolders="/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/permission_handler_android/generated/ap_generated_sources/release/out"
+      generatedResourceFolders="/home/pizi/Documents/Projects/flutter_scrcpygui_companion/build/permission_handler_android/generated/res/resValues/release"
+      desugaredMethodsFiles="/home/pizi/.gradle/caches/8.10.2/transforms/845d9227b0aa7afd95c9677206a478c7/transformed/D8BackportedDesugaredMethods.txt">
+  </artifact>
+</variant>

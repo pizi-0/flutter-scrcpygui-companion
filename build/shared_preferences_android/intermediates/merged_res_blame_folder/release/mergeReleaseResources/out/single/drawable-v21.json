@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/drawable-v21/abc_edit_text_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/drawable-v21/abc_edit_text_material.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/drawable-v21/abc_btn_colored_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/drawable-v21/abc_btn_colored_material.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/drawable-v21/ic_arrow_down_24dp.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-preference-1.2.1-0:/drawable-v21/ic_arrow_down_24dp.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/drawable-v21/abc_action_bar_item_background_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/drawable-v21/abc_action_bar_item_background_material.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/drawable-v21/notification_action_background.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-core-1.13.1-20:/drawable-v21/notification_action_background.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/drawable-v21/abc_dialog_material_background.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/drawable-v21/abc_dialog_material_background.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/drawable-v21/preference_list_divider_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-preference-1.2.1-0:/drawable-v21/preference_list_divider_material.xml"
+    },
+    {
+        "merged": "io.flutter.plugins.sharedpreferences.shared_preferences_android-release-40:/drawable-v21/abc_list_divider_material.xml",
+        "source": "io.flutter.plugins.sharedpreferences.shared_preferences_android-appcompat-1.1.0-9:/drawable-v21/abc_list_divider_material.xml"
+    }
+]
