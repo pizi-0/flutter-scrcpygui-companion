@@ -27,9 +27,7 @@ class ApiUtils {
 
       return devices;
     } catch (e) {
-      debugPrint(e.toString());
-
-      return [];
+      rethrow;
     }
   }
 
@@ -51,9 +49,7 @@ class ApiUtils {
 
       return configs;
     } catch (e) {
-      debugPrint(e.toString());
-
-      return [];
+      rethrow;
     }
   }
 
