@@ -97,8 +97,8 @@ class _ServerPageState extends ConsumerState<ServerPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 8,
                 children: [
+                  Text('Message: ${e.message}'),
                   Text('Make sure companion server is started on Scrcpy GUI'),
-                  Text('Error: ${e.message}'),
                 ],
               ),
               actions: [

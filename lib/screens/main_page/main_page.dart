@@ -169,7 +169,7 @@ class _ServerListTileState extends ConsumerState<ServerListTile>
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       clipBehavior: Clip.hardEdge,
-      margin: EdgeInsets.all(8),
+      margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Slidable(
         controller: slidableController,
         key: ValueKey(widget.serv),
