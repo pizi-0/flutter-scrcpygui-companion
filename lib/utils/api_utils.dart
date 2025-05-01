@@ -41,14 +41,14 @@ class ApiUtils {
 
     if (devices.contains(device)) {
       final endpoint =
-          'http://${server.endpoint}:${server.port}/disconnect?id=${device.id}';
+          'http://${server.endpoint}:${server.port}/devices/disconnect?deviceId=${device.id}';
       final res = await post(
         Uri.parse(endpoint),
         headers: {'x-api-key': XOR().xorEncode(server.secret)},
       );
 
       if (res.statusCode != 200) {
-        throw Exception('${res.statusCode} ${jsonDecode(res.body)['error']}');
+        throw Exception('${res.statusCode} ${res.body}');
       }
     }
   }
@@ -101,10 +101,18 @@ class ApiUtils {
     return pairs;
   }
 
-  static Future<List<ScrcpyInstance>> getInstances(ServerModel server) async {
+  static Future<List<ScrcpyInstance>> getInstances(
+    ServerModel server, {
+    AdbDevices? device,
+  }) async {
     List<ScrcpyInstance> instances = [];
 
-    final endpoint = 'http://${server.endpoint}:${server.port}/running';
+    var endpoint = 'http://${server.endpoint}:${server.port}/running';
+
+    if (device != null) {
+      endpoint += '?deviceId=${device.id}';
+    }
+
     final res = await get(
       Uri.parse(endpoint),
       headers: {'x-api-key': XOR().xorEncode(server.secret)},

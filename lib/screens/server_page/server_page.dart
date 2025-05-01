@@ -1,11 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:scrcpygui_companion/models/adb_devices.dart';
+import 'package:scrcpygui_companion/models/scrcpy_instance.dart';
 import 'package:scrcpygui_companion/utils/api_utils.dart';
 import 'package:string_extensions/string_extensions.dart';
 
@@ -24,13 +27,23 @@ class ServerPage extends ConsumerStatefulWidget {
 
 class _ServerPageState extends ConsumerState<ServerPage> {
   bool loading = false;
+  Timer? timer;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getData();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getData();
+      timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        _getData(noLoading: true);
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timer?.cancel();
   }
 
   @override
@@ -66,7 +79,7 @@ class _ServerPageState extends ConsumerState<ServerPage> {
               itemBuilder: (context, index) {
                 final d = devices[index];
 
-                return DeviceListTile(d: d);
+                return DeviceListTile(device: d);
               },
             ),
         ],
@@ -74,10 +87,12 @@ class _ServerPageState extends ConsumerState<ServerPage> {
     );
   }
 
-  _getData() async {
+  _getData({bool noLoading = false}) async {
     final server = ref.read(serverProvider)!;
 
-    setState(() => loading = true);
+    if (!noLoading) {
+      setState(() => loading = true);
+    }
 
     try {
       ref.read(devicesProvider.notifier).state = await ApiUtils.getDevices(
@@ -130,38 +145,149 @@ class _ServerPageState extends ConsumerState<ServerPage> {
             ),
       );
     } finally {
-      setState(() => loading = false);
+      if (mounted) {
+        if (!noLoading) {
+          setState(() => loading = false);
+        }
+      }
     }
   }
 }
 
-class DeviceListTile extends StatelessWidget {
-  const DeviceListTile({super.key, required this.d});
+class DeviceListTile extends ConsumerStatefulWidget {
+  final AdbDevices device;
+  const DeviceListTile({super.key, required this.device});
 
-  final AdbDevices d;
+  @override
+  ConsumerState<DeviceListTile> createState() => _DeviceListTileState();
+}
+
+class _DeviceListTileState extends ConsumerState<DeviceListTile> {
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
-    final isWireless = d.id.contains(_adbMdns) || d.id.isIpv4;
+    final isWireless =
+        widget.device.id.contains(_adbMdns) || widget.device.id.isIpv4;
+    final theme = Theme.of(context);
+
     return Card(
       clipBehavior: Clip.hardEdge,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      child: ListTile(
-        onTap:
-            () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => DevicePage(device: d)),
+      child: Slidable(
+        enabled: isWireless,
+        endActionPane: ActionPane(
+          motion: ScrollMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (a) => _disconnect(),
+              backgroundColor: theme.colorScheme.errorContainer,
+              icon: Icons.link_off_rounded,
             ),
-        leading:
-            isWireless ? Icon(Icons.wifi_rounded) : Icon(Icons.usb_rounded),
-        title: Text(d.name ?? d.modelName),
-        subtitle: Text(
-          d.id,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ).fontSize(12),
+          ],
+        ),
+        startActionPane: ActionPane(
+          motion: ScrollMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (a) => _disconnect(),
+              backgroundColor: theme.colorScheme.errorContainer,
+              icon: Icons.link_off_rounded,
+            ),
+          ],
+        ),
+        child: ListTile(
+          onTap:
+              () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DevicePage(device: widget.device),
+                ),
+              ),
+          leading:
+              isWireless ? Icon(Icons.wifi_rounded) : Icon(Icons.usb_rounded),
+          title: Text(widget.device.name ?? widget.device.modelName),
+          subtitle: Text(
+            widget.device.id,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ).fontSize(12),
+        ),
       ),
     );
+  }
+
+  _disconnect() async {
+    setState(() => loading = true);
+    final server = ref.read(serverProvider)!;
+
+    final List<ScrcpyInstance> instances = await ApiUtils.getInstances(
+      server,
+      device: widget.device,
+    );
+
+    final bool res =
+        (await showDialog(
+          context: context,
+          builder:
+              (context) => AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                title: Text(
+                  'Disconnect ${widget.device.name ?? widget.device.modelName}?',
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (instances.isNotEmpty)
+                      Text(
+                        '${widget.device.name ?? widget.device.modelName} has running scrcpy.\n\nDisconnecting will kill the running scrcpy.',
+                      ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text('Disconnect'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text('Cancel'),
+                  ),
+                ],
+              ),
+        )) ??
+        false;
+
+    if (!res) {
+      setState(() => loading = false);
+      return;
+    }
+
+    try {
+      await ApiUtils.disconnectDevice(server, widget.device);
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              title: Text('Error'),
+              content: Text(e.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => loading = false);
+      }
+    }
   }
 }
