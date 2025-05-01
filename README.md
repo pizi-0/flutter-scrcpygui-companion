@@ -1,17 +1,27 @@
-# scrcpygui_companion
+# Scrcpy GUI Companion
 
-A new Flutter project.
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?logo=flutter&logoColor=white)](https://flutter.dev/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Discord](https://img.shields.io/badge/scrcpygui-white?logo=discord&style=flat)](https://discord.gg/ZdV5DAxd8Y)
 
-## Getting Started
+ 
+> A companion app for my [Scrcpy GUI](https://github.com/pizi-0/flutter-scrcpygui), made purely to cater to my laziness to walk 2 feets to my table to start scrcpy. Probably not for most people.
 
-This project is a starting point for a Flutter application.
+## ✨ Key Features
+* Execute Scrcpy GUI commands remotely, such as:
+    * Start/stop scrcpy
+    * Disconnect wireless devices
 
-A few resources to get you started if this is your first Flutter project:
+> Disclaimer: Scrcpy GUI Companion does not do Android to Android mirroring. That is out of scope.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# flutter_scrcpygui_companion
+## 🛠️ Requirements
+
+* [Scrcpy GUI](https://github.com/pizi-0/flutter-scrcpygui) (Linux, Windows, Mac)
+    * needs to be running, and
+    * companion server started.
+
+## 🖥️ Supported platform
+
+* Android only
+
