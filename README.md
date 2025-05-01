@@ -25,3 +25,6 @@
 
 * Android only
 
+## 🖼️ Preview
+
+ <img src="https://github.com/pizi-0/img-collection/blob/main/flutter-scrcpygui-companion/1.server-list.jpg?raw=true" width="400" /> | <img src="https://github.com/pizi-0/img-collection/blob/main/flutter-scrcpygui-companion/2.device-list.jpg?raw=true" width="400" /> | <img src="https://github.com/pizi-0/img-collection/blob/main/flutter-scrcpygui-companion/3.config-list.jpg?raw=true" width="400" />
