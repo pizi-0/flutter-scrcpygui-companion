@@ -32,6 +32,9 @@ class _DevicePageState extends ConsumerState<DevicePage>
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
+    _tabController.addListener(() {
+      setState(() {});
+    });
     super.initState();
   }
 
@@ -104,21 +107,30 @@ class _DevicePageState extends ConsumerState<DevicePage>
             Padding(padding: const EdgeInsets.all(8.0), child: Text('Running')),
           ],
         ),
+
         actions: [
-          IconButton(
-            onPressed: loading ? null : _refreshData,
-            icon:
-                loading
-                    ? SizedBox.square(
-                      dimension: 18,
-                      child: CircularProgressIndicator(),
-                    )
-                    : Icon(Icons.refresh_rounded),
+          IgnorePointer(
+            ignoring: _tabController.index == 2,
+            child: AnimatedOpacity(
+              duration: 200.milliseconds,
+              opacity: _tabController.index < 2 ? 1 : 0,
+              child: IconButton(
+                onPressed: loading ? null : _refreshData,
+                icon:
+                    loading
+                        ? SizedBox.square(
+                          dimension: 18,
+                          child: CircularProgressIndicator(),
+                        )
+                        : Icon(Icons.refresh_rounded),
+              ),
+            ),
           ),
         ],
       ),
       body: TabBarView(
         controller: _tabController,
+
         children: [
           Padding(
             padding: EdgeInsets.only(top: 4),
@@ -207,12 +219,21 @@ class _PinnedAppsTabState extends ConsumerState<PinnedAppsTab> {
       ref.read(serverProvider)!,
       widget.device,
     );
+    setState(() => loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
     final server = ref.watch(serverProvider);
     final List<AppConfigPair> pinnedApps = ref.watch(pinnedAppProvider);
+
+    if (loading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (pinnedApps.isEmpty) {
+      return Center(child: Text('No pinned apps.'));
+    }
 
     return ListView.builder(
       itemCount: pinnedApps.length,

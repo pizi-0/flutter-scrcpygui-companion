@@ -58,9 +58,6 @@ class _ServerPageState extends ConsumerState<ServerPage> {
           subtitle: Text('${server.endpoint}:${server.port}').fontSize(12),
           contentPadding: EdgeInsets.zero,
         ),
-        actions: [
-          IconButton(onPressed: _getData, icon: Icon(Icons.refresh_rounded)),
-        ],
       ),
       body: CustomScrollView(
         slivers: [
