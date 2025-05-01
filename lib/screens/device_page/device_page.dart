@@ -310,11 +310,12 @@ class _ConfigListTileState extends State<ConfigListTile> {
                   widget.device,
                   widget.config,
                 );
-                await Future.delayed(500.milliseconds);
-                setState(() => loading = false);
               } catch (e) {
                 debugPrint(e.toString());
-                setState(() => loading = false);
+              } finally {
+                if (mounted) {
+                  setState(() => loading = false);
+                }
               }
             },
             icon:
