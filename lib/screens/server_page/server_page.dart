@@ -59,10 +59,21 @@ class _ServerPageState extends ConsumerState<ServerPage> {
           contentPadding: EdgeInsets.zero,
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Connect',
+        onPressed: _showConnectDialog,
+        child: Icon(Icons.link_rounded),
+      ),
       body: CustomScrollView(
         slivers: [
-          if (loading) const SliverFillRemaining(child: Center(child: CircularProgressIndicator())),
-          if (devices.isEmpty && !loading) const SliverFillRemaining(child: Center(child: Text('No devices found'))),
+          if (loading)
+            const SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          if (devices.isEmpty && !loading)
+            const SliverFillRemaining(
+              child: Center(child: Text('No devices found')),
+            ),
 
           if (devices.isNotEmpty)
             SliverList.builder(
@@ -75,9 +86,9 @@ class _ServerPageState extends ConsumerState<ServerPage> {
                     children: [
                       DeviceListTile(device: d),
                       Divider(endIndent: 10, indent: 10),
-                      Text(
-                        'Swipe left/right to disconnect device.',
-                      ).textColor(Theme.of(context).colorScheme.onSurface.withAlpha(100)),
+                      Text('Swipe left/right to disconnect device.').textColor(
+                        Theme.of(context).colorScheme.onSurface.withAlpha(100),
+                      ),
                     ],
                   );
                 }
@@ -98,22 +109,34 @@ class _ServerPageState extends ConsumerState<ServerPage> {
     }
 
     try {
-      ref.read(devicesProvider.notifier).state = await ApiUtils.getDevices(server);
+      ref.read(devicesProvider.notifier).state = await ApiUtils.getDevices(
+        server,
+      );
     } on SocketException catch (e) {
       showDialog(
         context: context,
         builder:
             (context) => AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               title: Text('Error'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 spacing: 8,
-                children: [Text('Message: ${e.message}'), Text('Make sure companion server is started on Scrcpy GUI')],
+                children: [
+                  Text('Message: ${e.message}'),
+                  Text('Make sure companion server is started on Scrcpy GUI'),
+                ],
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.popUntil(context, (route) => route.isFirst), child: Text('OK')),
+                TextButton(
+                  onPressed:
+                      () =>
+                          Navigator.popUntil(context, (route) => route.isFirst),
+                  child: Text('OK'),
+                ),
               ],
             ),
       );
@@ -122,10 +145,17 @@ class _ServerPageState extends ConsumerState<ServerPage> {
         context: context,
         builder:
             (context) => AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               title: Text('Error'),
               content: Text(e.toString()),
-              actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text('OK'))],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+                ),
+              ],
             ),
       );
     } finally {
@@ -133,6 +163,109 @@ class _ServerPageState extends ConsumerState<ServerPage> {
         if (!noLoading) {
           setState(() => loading = false);
         }
+      }
+    }
+  }
+
+  _showConnectDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) => ConnectWithIpDialog(),
+    );
+  }
+}
+
+class ConnectWithIpDialog extends ConsumerStatefulWidget {
+  const ConnectWithIpDialog({super.key});
+
+  @override
+  ConsumerState<ConnectWithIpDialog> createState() =>
+      _ConnectWithIpDialogState();
+}
+
+class _ConnectWithIpDialogState extends ConsumerState<ConnectWithIpDialog> {
+  final TextEditingController ipController = TextEditingController();
+  bool loading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(10)),
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 8,
+        children: [
+          TextField(
+            autofocus: true,
+            controller: ipController,
+            onChanged: (value) {
+              if (value.isIpv4) {
+                setState(() {});
+              }
+            },
+            onSubmitted: (value) => _connect(),
+            decoration: InputDecoration(
+              border: OutlineInputBorder(),
+              label: Text('ip:port'),
+              isDense: true,
+            ),
+          ),
+          Row(
+            spacing: 8,
+            children: [
+              Icon(Icons.info_rounded, size: 15),
+              Text('port defaults to 5555 if unspecified').textColor(
+                Theme.of(context).colorScheme.onSurface.withAlpha(200),
+              ),
+            ],
+          ),
+        ],
+      ),
+      title: Text('Connect device'),
+      actions: [
+        if (ipController.text.isIpv4)
+          TextButton(onPressed: _connect, child: Text('Connect')),
+        TextButton(
+          child: Text('Cancel'),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+    );
+  }
+
+  _connect() async {
+    setState(() => loading = true);
+
+    try {
+      await ApiUtils.connectDevice(
+        ref.read(serverProvider)!,
+        ipController.text,
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder:
+            (context) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              title: Text('Error'),
+              content: Text(e.toString()),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+                ),
+              ],
+            ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => loading = false);
       }
     }
   }
@@ -146,7 +279,8 @@ class DeviceListTile extends ConsumerStatefulWidget {
   ConsumerState<DeviceListTile> createState() => _DeviceListTileState();
 }
 
-class _DeviceListTileState extends ConsumerState<DeviceListTile> with SingleTickerProviderStateMixin {
+class _DeviceListTileState extends ConsumerState<DeviceListTile>
+    with SingleTickerProviderStateMixin {
   bool loading = false;
   SlidableController? slidableController;
 
@@ -164,7 +298,8 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final isWireless = widget.device.id.contains(_adbMdns) || widget.device.id.isIpv4;
+    final isWireless =
+        widget.device.id.contains(_adbMdns) || widget.device.id.isIpv4;
     final theme = Theme.of(context);
 
     return Card(
@@ -204,11 +339,21 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile> with SingleTick
               return;
             }
 
-            Navigator.push(context, MaterialPageRoute(builder: (context) => DevicePage(device: widget.device)));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DevicePage(device: widget.device),
+              ),
+            );
           },
-          leading: isWireless ? Icon(Icons.wifi_rounded) : Icon(Icons.usb_rounded),
+          leading:
+              isWireless ? Icon(Icons.wifi_rounded) : Icon(Icons.usb_rounded),
           title: Text(widget.device.name ?? widget.device.modelName),
-          subtitle: Text(widget.device.id, maxLines: 1, overflow: TextOverflow.ellipsis).fontSize(12),
+          subtitle: Text(
+            widget.device.id,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ).fontSize(12),
         ),
       ),
     );
@@ -218,15 +363,22 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile> with SingleTick
     setState(() => loading = true);
     final server = ref.read(serverProvider)!;
 
-    final List<ScrcpyInstance> instances = await ApiUtils.getInstances(server, device: widget.device);
+    final List<ScrcpyInstance> instances = await ApiUtils.getInstances(
+      server,
+      device: widget.device,
+    );
 
     final bool res =
         (await showDialog(
           context: context,
           builder:
               (context) => AlertDialog(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                title: Text('Disconnect ${widget.device.name ?? widget.device.modelName}?'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                title: Text(
+                  'Disconnect ${widget.device.name ?? widget.device.modelName}?',
+                ),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,8 +390,14 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile> with SingleTick
                   ],
                 ),
                 actions: [
-                  TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Disconnect')),
-                  TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel')),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text('Disconnect'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text('Cancel'),
+                  ),
                 ],
               ),
         )) ??
@@ -259,7 +417,12 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile> with SingleTick
             (context) => AlertDialog(
               title: Text('Error'),
               content: Text(e.toString()),
-              actions: [TextButton(onPressed: () => Navigator.pop(context), child: Text('OK'))],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+                ),
+              ],
             ),
       );
     } finally {

@@ -33,6 +33,19 @@ class ApiUtils {
     return devices;
   }
 
+  static Future<void> connectDevice(ServerModel server, String ipport) async {
+    final endpoint =
+        'http://${server.endpoint}:${server.port}/devices/connect?ip=$ipport';
+    final res = await post(
+      Uri.parse(endpoint),
+      headers: {'x-api-key': XOR().xorEncode(server.secret)},
+    );
+
+    if (res.statusCode != 200) {
+      throw Exception('${res.statusCode} \n\n${res.body}');
+    }
+  }
+
   static Future<void> disconnectDevice(
     ServerModel server,
     AdbDevices device,
@@ -48,7 +61,7 @@ class ApiUtils {
       );
 
       if (res.statusCode != 200) {
-        throw Exception('${res.statusCode} ${res.body}');
+        throw Exception('\n${res.statusCode} \n${res.body}');
       }
     }
   }
