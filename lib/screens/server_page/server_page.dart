@@ -33,10 +33,12 @@ class _ServerPageState extends ConsumerState<ServerPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _getData();
-      timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        _getData(noLoading: true);
-      });
+      final success = await _getData();
+      if (success) {
+        timer = Timer.periodic(Duration(seconds: 1), (timer) {
+          _getData(noLoading: true);
+        });
+      }
     });
   }
 
@@ -112,6 +114,8 @@ class _ServerPageState extends ConsumerState<ServerPage> {
       ref.read(devicesProvider.notifier).state = await ApiUtils.getDevices(
         server,
       );
+
+      return true;
     } on SocketException catch (e) {
       showDialog(
         context: context,
@@ -140,6 +144,7 @@ class _ServerPageState extends ConsumerState<ServerPage> {
               ],
             ),
       );
+      return false;
     } catch (e) {
       showDialog(
         context: context,
@@ -158,6 +163,7 @@ class _ServerPageState extends ConsumerState<ServerPage> {
               ],
             ),
       );
+      return false;
     } finally {
       if (mounted) {
         if (!noLoading) {
