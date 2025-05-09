@@ -1,23 +1,21 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:scrcpygui_companion/models/adb_devices.dart';
-import 'package:scrcpygui_companion/models/app_config_pair.dart';
-import 'package:scrcpygui_companion/models/scrcpy_config.dart';
-import 'package:scrcpygui_companion/models/scrcpy_instance.dart';
-import 'package:scrcpygui_companion/models/server_model.dart';
+import 'package:scrcpygui_companion/models/companion_server/client_payload.dart';
+import 'package:scrcpygui_companion/models/companion_server/data/config_payload.dart';
+import 'package:scrcpygui_companion/models/companion_server/data/device_payload.dart';
+import 'package:scrcpygui_companion/models/companion_server/data/pairs_payload.dart';
 import 'package:scrcpygui_companion/provider/data_provider.dart';
-import 'package:scrcpygui_companion/utils/api_utils.dart';
+import 'package:scrcpygui_companion/utils/server_utils.dart';
 import 'package:string_extensions/string_extensions.dart';
-
-import '../../provider/server_provider.dart';
 
 const String _adbMdns = '_adb-tls-connect._tcp';
 
 class DevicePage extends ConsumerStatefulWidget {
-  final AdbDevices device;
+  final DevicePayload device;
   const DevicePage({super.key, required this.device});
 
   @override
@@ -38,33 +36,6 @@ class _DevicePageState extends ConsumerState<DevicePage>
     super.initState();
   }
 
-  _refreshData() async {
-    try {
-      setState(() => loading = true);
-      final server = ref.read(serverProvider)!;
-      final device = widget.device;
-
-      switch (_tabController.index) {
-        case 0:
-          ref
-              .read(pinnedAppProvider.notifier)
-              .state = await ApiUtils.getPinnedApps(server, device);
-          break;
-        case 1:
-          ref.read(configsProvider.notifier).state = await ApiUtils.getConfigs(
-            server,
-          );
-          break;
-
-        default:
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      setState(() => loading = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final device = widget.device;
@@ -82,7 +53,7 @@ class _DevicePageState extends ConsumerState<DevicePage>
               ),
               Expanded(
                 child: Text(
-                  device.name ?? device.modelName,
+                  device.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -107,26 +78,6 @@ class _DevicePageState extends ConsumerState<DevicePage>
             Padding(padding: const EdgeInsets.all(8.0), child: Text('Running')),
           ],
         ),
-
-        actions: [
-          IgnorePointer(
-            ignoring: _tabController.index == 2,
-            child: AnimatedOpacity(
-              duration: 200.milliseconds,
-              opacity: _tabController.index < 2 ? 1 : 0,
-              child: IconButton(
-                onPressed: loading ? null : _refreshData,
-                icon:
-                    loading
-                        ? SizedBox.square(
-                          dimension: 18,
-                          child: CircularProgressIndicator(),
-                        )
-                        : Icon(Icons.refresh_rounded),
-              ),
-            ),
-          ),
-        ],
       ),
       body: TabBarView(
         controller: _tabController,
@@ -151,7 +102,7 @@ class _DevicePageState extends ConsumerState<DevicePage>
 }
 
 class ConfigTab extends ConsumerStatefulWidget {
-  final AdbDevices device;
+  final DevicePayload device;
   const ConfigTab({super.key, required this.device});
 
   @override
@@ -160,24 +111,9 @@ class ConfigTab extends ConsumerStatefulWidget {
 
 class _ConfigTabState extends ConsumerState<ConfigTab> {
   bool loading = false;
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getConfigs();
-    });
-  }
-
-  _getConfigs() async {
-    setState(() => loading = true);
-    ref.read(configsProvider.notifier).state = await ApiUtils.getConfigs(
-      ref.read(serverProvider)!,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
-    final server = ref.watch(serverProvider)!;
     final configs = ref.watch(configsProvider);
 
     return ListView.builder(
@@ -185,18 +121,14 @@ class _ConfigTabState extends ConsumerState<ConfigTab> {
       itemBuilder: (context, index) {
         final config = configs[index];
 
-        return ConfigListTile(
-          config: config,
-          server: server,
-          device: widget.device,
-        );
+        return ConfigListTile(config: config, device: widget.device);
       },
     );
   }
 }
 
 class PinnedAppsTab extends ConsumerStatefulWidget {
-  final AdbDevices device;
+  final DevicePayload device;
   const PinnedAppsTab({super.key, required this.device});
 
   @override
@@ -208,24 +140,15 @@ class _PinnedAppsTabState extends ConsumerState<PinnedAppsTab> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getPinnedApps();
-    });
-  }
-
-  _getPinnedApps() async {
-    setState(() => loading = true);
-    ref.read(pinnedAppProvider.notifier).state = await ApiUtils.getPinnedApps(
-      ref.read(serverProvider)!,
-      widget.device,
-    );
-    setState(() => loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final server = ref.watch(serverProvider);
-    final List<AppConfigPair> pinnedApps = ref.watch(pinnedAppProvider);
+    final List<PairsPayload> pinnedApps =
+        ref
+            .watch(pinnedAppProvider)
+            .where((p) => p.deviceId == widget.device.id)
+            .toList();
 
     if (loading) {
       return Center(child: CircularProgressIndicator());
@@ -240,20 +163,15 @@ class _PinnedAppsTabState extends ConsumerState<PinnedAppsTab> {
       itemBuilder: (context, index) {
         final pinned = pinnedApps[index];
 
-        return PinnedAppsListTile(server: server!, pinned: pinned);
+        return PinnedAppsListTile(pinned: pinned);
       },
     );
   }
 }
 
 class PinnedAppsListTile extends StatefulWidget {
-  final ServerModel server;
-  final AppConfigPair pinned;
-  const PinnedAppsListTile({
-    super.key,
-    required this.pinned,
-    required this.server,
-  });
+  final PairsPayload pinned;
+  const PinnedAppsListTile({super.key, required this.pinned});
 
   @override
   State<PinnedAppsListTile> createState() => _PinnedAppsListTileState();
@@ -265,7 +183,13 @@ class _PinnedAppsListTileState extends State<PinnedAppsListTile> {
   _start() async {
     setState(() => loading = true);
     try {
-      await ApiUtils.startPinnedApp(widget.server, widget.pinned);
+      final server = ServerUtils();
+      await server.sendMessage(
+        ClientPayload(
+          action: ClientAction.startAppConfigPair,
+          payload: jsonEncode({'hash': widget.pinned.hash}),
+        ),
+      );
     } finally {
       setState(() => loading = false);
     }
@@ -277,8 +201,8 @@ class _PinnedAppsListTileState extends State<PinnedAppsListTile> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
-        title: Text(widget.pinned.app.name),
-        subtitle: Text('On: ${widget.pinned.config.configName}').fontSize(12),
+        title: Text(widget.pinned.name),
+        subtitle: Text('On: ${widget.pinned.config.name}').fontSize(12),
         trailing: IconButton(
           onPressed: _start,
           icon:
@@ -295,16 +219,10 @@ class _PinnedAppsListTileState extends State<PinnedAppsListTile> {
 }
 
 class ConfigListTile extends StatefulWidget {
-  const ConfigListTile({
-    super.key,
-    required this.config,
-    required this.server,
-    required this.device,
-  });
+  const ConfigListTile({super.key, required this.config, required this.device});
 
-  final ScrcpyConfig config;
-  final ServerModel server;
-  final AdbDevices device;
+  final ConfigPayload config;
+  final DevicePayload device;
 
   @override
   State<ConfigListTile> createState() => _ConfigListTileState();
@@ -321,15 +239,20 @@ class _ConfigListTileState extends State<ConfigListTile> {
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: ListTile(
-          title: Text(widget.config.configName),
+          title: Text(widget.config.name),
           trailing: IconButton(
             onPressed: () async {
               try {
                 setState(() => loading = true);
-                await ApiUtils.startConfig(
-                  widget.server,
-                  widget.device,
-                  widget.config,
+                final server = ServerUtils();
+                await server.sendMessage(
+                  ClientPayload(
+                    action: ClientAction.startScrcpy,
+                    payload: jsonEncode({
+                      'deviceId': widget.device.id,
+                      'configId': widget.config.id,
+                    }),
+                  ),
                 );
               } catch (e) {
                 debugPrint(e.toString());
@@ -354,7 +277,7 @@ class _ConfigListTileState extends State<ConfigListTile> {
 }
 
 class InstanceTab extends ConsumerStatefulWidget {
-  final AdbDevices device;
+  final DevicePayload device;
   const InstanceTab({super.key, required this.device});
 
   @override
@@ -363,18 +286,13 @@ class InstanceTab extends ConsumerStatefulWidget {
 
 class _InstanceTabState extends ConsumerState<InstanceTab> {
   bool loading = false;
-  List<ScrcpyInstance> instances = [];
+
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getRunning();
-      timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        _getRunning(noLoading: true);
-      });
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {});
   }
 
   @override
@@ -385,7 +303,11 @@ class _InstanceTabState extends ConsumerState<InstanceTab> {
 
   @override
   Widget build(BuildContext context) {
-    final server = ref.watch(serverProvider)!;
+    final instances =
+        ref
+            .watch(instancesProvider)
+            .where((i) => i.deviceId == widget.device.id)
+            .toList();
 
     return CustomScrollView(
       slivers: [
@@ -413,8 +335,15 @@ class _InstanceTabState extends ConsumerState<InstanceTab> {
                   child: ListTile(
                     title: Text(instance.name),
                     trailing: IconButton(
-                      onPressed:
-                          () => ApiUtils.stopConfig(server, instance.pid),
+                      onPressed: () async {
+                        final server = ServerUtils();
+                        await server.sendMessage(
+                          ClientPayload(
+                            action: ClientAction.killScrcpy,
+                            payload: jsonEncode({'pid': instance.pid}),
+                          ),
+                        );
+                      },
                       icon: Icon(Icons.stop_rounded),
                     ),
                   ),
@@ -424,24 +353,5 @@ class _InstanceTabState extends ConsumerState<InstanceTab> {
           ),
       ],
     );
-  }
-
-  _getRunning({bool noLoading = false}) async {
-    if (!noLoading) {
-      setState(() => loading = true);
-    }
-    try {
-      final inst = await ApiUtils.getInstances(ref.read(serverProvider)!);
-
-      instances = inst.where((i) => i.device == widget.device.id).toList();
-
-      if (mounted) {
-        setState(() {});
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      setState(() => loading = false);
-    }
   }
 }

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrcpygui_companion/provider/server_provider.dart';
 import 'package:scrcpygui_companion/screens/server_page/server_page.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:scrcpygui_companion/utils/server_utils.dart';
 
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
 
@@ -23,6 +24,7 @@ class MainPage extends ConsumerStatefulWidget {
 
 class _MainPageState extends ConsumerState<MainPage> {
   bool loading = false;
+  final ServerUtils server = ServerUtils();
 
   @override
   void initState() {
@@ -74,7 +76,11 @@ class _MainPageState extends ConsumerState<MainPage> {
                   );
                 }
 
-                return ServerListTile(serv: serv, ref: ref);
+                return ServerListTile(
+                  key: ValueKey(serv),
+                  serv: serv,
+                  ref: ref,
+                );
               },
             ),
         ],
@@ -163,6 +169,12 @@ class _ServerListTileState extends ConsumerState<ServerListTile>
   }
 
   @override
+  void dispose() {
+    slidableController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -207,24 +219,42 @@ class _ServerListTileState extends ConsumerState<ServerListTile>
         ),
         child: ListTile(
           title: Text(widget.serv.name),
-          subtitle: Text(
-            '${widget.serv.endpoint}:${widget.serv.port}',
-          ).fontSize(12),
+          subtitle: Text('${widget.serv.ip}:${widget.serv.port}').fontSize(12),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
           trailing: Icon(Icons.chevron_right_rounded),
-          onTap: () {
-            if (slidableController.ratio != 0.0) {
-              slidableController.close();
-              return;
-            }
+          onTap: () async {
+            try {
+              final server = ServerUtils();
+              if (slidableController.ratio != 0.0) {
+                slidableController.close();
+                return;
+              }
 
-            widget.ref.read(serverProvider.notifier).setServer(widget.serv);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ServerPage()),
-            );
+              await server.connect(widget.serv);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ServerPage(server: widget.serv),
+                ),
+              );
+            } on Exception catch (e) {
+              showDialog(
+                context: context,
+                builder:
+                    (context) => AlertDialog(
+                      title: Text('Error'),
+                      content: Text(e.toString()),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('OK'),
+                        ),
+                      ],
+                    ),
+              );
+            }
           },
         ),
       ),

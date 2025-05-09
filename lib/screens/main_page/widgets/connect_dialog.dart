@@ -7,6 +7,7 @@ import 'package:scrcpygui_companion/utils/db.dart';
 
 import '../../../models/server_model.dart';
 import '../../../provider/server_provider.dart';
+import '../../../utils/server_utils.dart';
 
 class ConnectDialog extends ConsumerStatefulWidget {
   const ConnectDialog({super.key, required this.server});
@@ -31,7 +32,7 @@ class _ConnectDialogState extends ConsumerState<ConnectDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Server name: ${widget.server.name}'),
-            Text('Endpoint: ${widget.server.endpoint}:${widget.server.port}'),
+            Text('Endpoint: ${widget.server.ip}:${widget.server.port}'),
           ],
         ),
       ),
@@ -48,15 +49,20 @@ class _ConnectDialogState extends ConsumerState<ConnectDialog> {
     setState(() => _loading = true);
 
     try {
-      ref.read(serverProvider.notifier).setServer(widget.server);
+      final server = ServerUtils();
+
       ref.read(serverListProvider.notifier).addServer(widget.server);
 
       await Db.saveServers(ref.read(serverListProvider));
 
       Navigator.pop(context);
+      await server.connect(widget.server);
+
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ServerPage()),
+        MaterialPageRoute(
+          builder: (context) => ServerPage(server: widget.server),
+        ),
       );
     } catch (e) {
       debugPrint(e.toString());

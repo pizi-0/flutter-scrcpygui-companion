@@ -1,25 +1,28 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:async';
-import 'dart:io';
+import 'dart:convert';
 
 import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:scrcpygui_companion/models/adb_devices.dart';
-import 'package:scrcpygui_companion/models/scrcpy_instance.dart';
-import 'package:scrcpygui_companion/utils/api_utils.dart';
+import 'package:scrcpygui_companion/models/companion_server/client_payload.dart';
+import 'package:scrcpygui_companion/models/companion_server/data/device_payload.dart';
+import 'package:scrcpygui_companion/models/companion_server/data/instance_payload.dart';
+import 'package:scrcpygui_companion/utils/server_payload_parser.dart';
+import 'package:scrcpygui_companion/utils/server_utils.dart';
 import 'package:string_extensions/string_extensions.dart';
 
+import '../../models/companion_server/server_payload.dart';
+import '../../models/server_model.dart';
 import '../../provider/data_provider.dart';
-import '../../provider/server_provider.dart';
 import '../device_page/device_page.dart';
 
 const String _adbMdns = '_adb-tls-connect._tcp';
 
 class ServerPage extends ConsumerStatefulWidget {
-  const ServerPage({super.key});
+  final ServerModel server;
+  const ServerPage({super.key, required this.server});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _ServerPageState();
@@ -27,37 +30,33 @@ class ServerPage extends ConsumerStatefulWidget {
 
 class _ServerPageState extends ConsumerState<ServerPage> {
   bool loading = false;
-  Timer? timer;
+
+  ServerUtils server = ServerUtils();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final success = await _getData();
-      if (success) {
-        timer = Timer.periodic(Duration(seconds: 1), (timer) {
-          _getData(noLoading: true);
-        });
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initServer();
     });
   }
 
   @override
   void dispose() {
+    server.socket.close();
     super.dispose();
-    timer?.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
-    final server = ref.watch(serverProvider);
+    final server = widget.server;
     final devices = ref.watch(devicesProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: ListTile(
-          title: Text(server!.name),
-          subtitle: Text('${server.endpoint}:${server.port}').fontSize(12),
+          title: Text(server.name),
+          subtitle: Text('${server.ip}:${server.port}').fontSize(12),
           contentPadding: EdgeInsets.zero,
         ),
       ),
@@ -103,74 +102,26 @@ class _ServerPageState extends ConsumerState<ServerPage> {
     );
   }
 
-  _getData({bool noLoading = false}) async {
-    final server = ref.read(serverProvider)!;
+  _initServer() async {
+    server.socket.listen(
+      (data) {
+        final decoded = utf8.decode(data);
+        final decodedLines = decoded.splitLines();
 
-    if (!noLoading) {
-      setState(() => loading = true);
-    }
+        decodedLines.removeWhere((element) => element.isEmpty);
 
-    try {
-      ref.read(devicesProvider.notifier).state = await ApiUtils.getDevices(
-        server,
-      );
+        final serverPayload = ServerPayload.fromJson(decodedLines.last);
 
-      return true;
-    } on SocketException catch (e) {
-      showDialog(
-        context: context,
-        builder:
-            (context) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: Text('Error'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 8,
-                children: [
-                  Text('Message: ${e.message}'),
-                  Text('Make sure companion server is started on Scrcpy GUI'),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed:
-                      () =>
-                          Navigator.popUntil(context, (route) => route.isFirst),
-                  child: Text('OK'),
-                ),
-              ],
-            ),
-      );
-      return false;
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder:
-            (context) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              title: Text('Error'),
-              content: Text(e.toString()),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text('OK'),
-                ),
-              ],
-            ),
-      );
-      return false;
-    } finally {
-      if (mounted) {
-        if (!noLoading) {
-          setState(() => loading = false);
-        }
-      }
-    }
+        ServerParser.parse(ref, serverPayload: serverPayload);
+      },
+      onDone: () {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      },
+      onError: (e, t) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+      },
+      cancelOnError: true,
+    );
   }
 
   _showConnectDialog() async {
@@ -245,9 +196,13 @@ class _ConnectWithIpDialogState extends ConsumerState<ConnectWithIpDialog> {
     setState(() => loading = true);
 
     try {
-      await ApiUtils.connectDevice(
-        ref.read(serverProvider)!,
-        ipController.text,
+      final server = ServerUtils();
+
+      await server.sendMessage(
+        ClientPayload(
+          action: ClientAction.connectDevice,
+          payload: jsonEncode({'ip': ipController.text.trim()}),
+        ),
       );
 
       Navigator.pop(context);
@@ -278,7 +233,7 @@ class _ConnectWithIpDialogState extends ConsumerState<ConnectWithIpDialog> {
 }
 
 class DeviceListTile extends ConsumerStatefulWidget {
-  final AdbDevices device;
+  final DevicePayload device;
   const DeviceListTile({super.key, required this.device});
 
   @override
@@ -354,7 +309,7 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
           },
           leading:
               isWireless ? Icon(Icons.wifi_rounded) : Icon(Icons.usb_rounded),
-          title: Text(widget.device.name ?? widget.device.modelName),
+          title: Text(widget.device.name),
           subtitle: Text(
             widget.device.id,
             maxLines: 1,
@@ -367,12 +322,12 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
 
   _disconnect() async {
     setState(() => loading = true);
-    final server = ref.read(serverProvider)!;
 
-    final List<ScrcpyInstance> instances = await ApiUtils.getInstances(
-      server,
-      device: widget.device,
-    );
+    final List<InstancePayload> instances =
+        ref
+            .read(instancesProvider)
+            .where((i) => i.deviceId == widget.device.id)
+            .toList();
 
     final bool res =
         (await showDialog(
@@ -382,16 +337,14 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                title: Text(
-                  'Disconnect ${widget.device.name ?? widget.device.modelName}?',
-                ),
+                title: Text('Disconnect ${widget.device.name}?'),
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (instances.isNotEmpty)
                       Text(
-                        '${widget.device.name ?? widget.device.modelName} has running scrcpy.\n\nDisconnecting will kill the running scrcpy.',
+                        '${widget.device.name} has running scrcpy.\n\nDisconnecting will kill the running scrcpy.',
                       ),
                   ],
                 ),
@@ -415,7 +368,14 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
     }
 
     try {
-      await ApiUtils.disconnectDevice(server, widget.device);
+      final server = ServerUtils();
+
+      await server.sendMessage(
+        ClientPayload(
+          action: ClientAction.disconnectDevice,
+          payload: jsonEncode({'deviceId': widget.device.id}),
+        ),
+      );
     } catch (e) {
       showDialog(
         context: context,
