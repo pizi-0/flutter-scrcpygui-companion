@@ -3,27 +3,27 @@ import 'dart:convert';
 
 class ServerModel {
   final String name;
-  final String endpoint;
+  final String ip;
   final String secret;
-  final String port;
+  final int port;
 
   ServerModel({
     required this.name,
-    required this.endpoint,
+    required this.ip,
     required this.secret,
     required this.port,
   });
 
   ServerModel copyWith({
     String? name,
-    String? endpoint,
+    String? ip,
     String? secret,
-    String? port,
+    int? port,
     bool? startOnLaunch,
   }) {
     return ServerModel(
       name: name ?? this.name,
-      endpoint: endpoint ?? this.endpoint,
+      ip: ip ?? this.ip,
       secret: secret ?? this.secret,
       port: port ?? this.port,
     );
@@ -32,7 +32,7 @@ class ServerModel {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'name': name,
-      'endpoint': endpoint,
+      'ip': ip,
       'secret': secret,
       'port': port,
     };
@@ -41,9 +41,9 @@ class ServerModel {
   factory ServerModel.fromMap(Map<String, dynamic> map) {
     return ServerModel(
       name: map['name'] as String,
-      endpoint: map['endpoint'] as String,
+      ip: map['ip'] as String,
       secret: map['secret'] as String,
-      port: map['port'] as String,
+      port: map['port'] as int,
     );
   }
 
@@ -54,7 +54,7 @@ class ServerModel {
 
   @override
   String toString() {
-    return 'ServerModel(name: $name, endpoint: $endpoint, secret: $secret, port: $port)';
+    return 'ServerModel(name: $name, ip: $ip, secret: $secret, port: $port)';
   }
 
   @override
@@ -62,13 +62,13 @@ class ServerModel {
     if (identical(this, other)) return true;
 
     return other.name == name &&
-        other.endpoint == endpoint &&
+        other.ip == ip &&
         other.secret == secret &&
         other.port == port;
   }
 
   @override
   int get hashCode {
-    return name.hashCode ^ endpoint.hashCode ^ secret.hashCode ^ port.hashCode;
+    return name.hashCode ^ ip.hashCode ^ secret.hashCode ^ port.hashCode;
   }
 }
