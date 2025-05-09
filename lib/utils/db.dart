@@ -4,6 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/server_model.dart';
 
 class Db {
+  static clearPrefs(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(key);
+  }
+
   static Future<List<ServerModel>> getServerList() async {
     final prefs = await SharedPreferences.getInstance();
     final servers =
