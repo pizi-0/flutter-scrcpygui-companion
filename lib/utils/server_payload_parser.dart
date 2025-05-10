@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/device_payload.dart';
+import 'package:scrcpygui_companion/models/companion_server/data/error_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/instance_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/pairs_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/server_payload.dart';
@@ -60,6 +61,9 @@ class ServerParser {
 
         ref.read(pinnedAppProvider.notifier).update((state) => pairList);
         break;
+      case ServerPayloadType.error:
+        final json = jsonDecode(serverPayload.payload);
+        return ErrorPayload.fromMap(json);
     }
   }
 }

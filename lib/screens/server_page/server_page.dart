@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:scrcpygui_companion/models/companion_server/client_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/device_payload.dart';
+import 'package:scrcpygui_companion/models/companion_server/data/error_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/instance_payload.dart';
 import 'package:scrcpygui_companion/utils/server_payload_parser.dart';
 import 'package:scrcpygui_companion/utils/server_utils.dart';
@@ -112,7 +113,27 @@ class _ServerPageState extends ConsumerState<ServerPage> {
 
         final serverPayload = ServerPayload.fromJson(decodedLines.last);
 
-        ServerParser.parse(ref, serverPayload: serverPayload);
+        final res = ServerParser.parse(ref, serverPayload: serverPayload);
+
+        if (res is ErrorPayload) {
+          showDialog(
+            context: context,
+            builder:
+                (context) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  title: Text('Error'),
+                  content: Text(res.message),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('Ok'),
+                    ),
+                  ],
+                ),
+          );
+        }
       },
       onDone: () {
         Navigator.popUntil(context, (route) => route.isFirst);

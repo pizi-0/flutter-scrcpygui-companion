@@ -27,4 +27,4 @@ class ServerPayload {
       ServerPayload.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
-enum ServerPayloadType { devices, configs, runnings, pairs, initialData }
+enum ServerPayloadType { devices, configs, runnings, pairs, initialData, error }
