@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 
-import 'package:awesome_extensions/awesome_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -51,53 +50,91 @@ class _ServerPageState extends ConsumerState<ServerPage> {
   @override
   Widget build(BuildContext context) {
     final server = widget.server;
-    final devices = ref.watch(devicesProvider);
+    final devices = ref.watch(devicesProvider).reversed.toList();
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: ListTile(
           title: Text(server.name),
-          subtitle: Text('${server.ip}:${server.port}').fontSize(12),
+          subtitle: Text(
+            '${server.ip}:${server.port}',
+            style: theme.textTheme.bodySmall,
+          ),
           contentPadding: EdgeInsets.zero,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        tooltip: 'Connect',
-        onPressed: _showConnectDialog,
-        child: Icon(Icons.link_rounded),
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+          child: ElevatedButton.icon(
+            icon: Icon(Icons.add_link_rounded),
+            label: Text('Connect Device'),
+            onPressed: _showConnectDialog,
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(
+                vertical: 12,
+              ), // Adjust padding for better look
+              textStyle: theme.textTheme.titleMedium, // Make text a bit larger
+            ),
+          ),
+        ),
       ),
+
       body: CustomScrollView(
+        reverse: true,
         slivers: [
           if (loading)
             const SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
             ),
           if (devices.isEmpty && !loading)
-            const SliverFillRemaining(
-              child: Center(child: Text('No devices found')),
+            SliverFillRemaining(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.phonelink_off_rounded,
+                      size: 48,
+                      color: theme.colorScheme.onSurface.withAlpha(150),
+                    ),
+                    SizedBox(height: 16),
+                    Text('No devices found'),
+                  ],
+                ),
+              ),
             ),
 
-          if (devices.isNotEmpty)
+          if (devices.isNotEmpty) ...[
+            SliverToBoxAdapter(
+              child: Padding(padding: const EdgeInsets.only(bottom: 8)),
+            ),
             SliverList.builder(
               itemCount: devices.length,
               itemBuilder: (context, index) {
                 final d = devices[index];
-
-                if (index == devices.length - 1) {
-                  return Column(
-                    children: [
-                      DeviceListTile(device: d),
-                      Divider(endIndent: 10, indent: 10),
-                      Text('Swipe left/right to disconnect device.').textColor(
-                        Theme.of(context).colorScheme.onSurface.withAlpha(100),
-                      ),
-                    ],
-                  );
-                }
-
                 return DeviceListTile(device: d);
               },
             ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 24.0,
+                ),
+                child: Center(
+                  child: Text(
+                    'Swipe left/right to disconnect wireless devices.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(150),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -119,15 +156,15 @@ class _ServerPageState extends ConsumerState<ServerPage> {
           showDialog(
             context: context,
             builder:
-                (context) => AlertDialog(
+                (dialogContext) => AlertDialog(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                   title: Text('Error'),
                   content: Text(res.message),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(dialogContext),
                       child: Text('Ok'),
                     ),
                   ],
@@ -194,8 +231,16 @@ class _ConnectWithIpDialogState extends ConsumerState<ConnectWithIpDialog> {
             spacing: 8,
             children: [
               Icon(Icons.info_rounded, size: 15),
-              Text('port defaults to 5555 if unspecified').textColor(
-                Theme.of(context).colorScheme.onSurface.withAlpha(200),
+              Expanded(
+                // Added Expanded for long text
+                child: Text(
+                  'Port defaults to 5555 if unspecified.',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withAlpha(200),
+                  ),
+                ),
               ),
             ],
           ),
@@ -231,15 +276,15 @@ class _ConnectWithIpDialogState extends ConsumerState<ConnectWithIpDialog> {
       showDialog(
         context: context,
         builder:
-            (context) => AlertDialog(
+            (dialogContext) => AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10.0),
               ),
               title: Text('Error'),
               content: Text(e.toString()),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(dialogContext),
                   child: Text('OK'),
                 ),
               ],
@@ -334,8 +379,9 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
           subtitle: Text(
             widget.device.id,
             maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ).fontSize(12),
+            overflow: TextOverflow.ellipsis, // Keep this
+            style: Theme.of(context).textTheme.bodySmall, // Use theme style
+          ),
         ),
       ),
     );
@@ -354,9 +400,9 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
         (await showDialog(
           context: context,
           builder:
-              (context) => AlertDialog(
+              (dialogContext) => AlertDialog(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
                 title: Text('Disconnect ${widget.device.name}?'),
                 content: Column(
@@ -371,11 +417,11 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
                 ),
                 actions: [
                   TextButton(
-                    onPressed: () => Navigator.pop(context, true),
+                    onPressed: () => Navigator.pop(dialogContext, true),
                     child: Text('Disconnect'),
                   ),
                   TextButton(
-                    onPressed: () => Navigator.pop(context, false),
+                    onPressed: () => Navigator.pop(dialogContext, false),
                     child: Text('Cancel'),
                   ),
                 ],
@@ -401,12 +447,16 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
       showDialog(
         context: context,
         builder:
-            (context) => AlertDialog(
+            (dialogContext) => AlertDialog(
+              shape: RoundedRectangleBorder(
+                // Added for consistency
+                borderRadius: BorderRadius.circular(10.0),
+              ),
               title: Text('Error'),
               content: Text(e.toString()),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(dialogContext),
                   child: Text('OK'),
                 ),
               ],

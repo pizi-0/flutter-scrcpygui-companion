@@ -1,6 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:awesome_extensions/awesome_extensions_flutter.dart';
 import 'package:encrypt_decrypt_plus/encrypt_decrypt/xor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,44 +37,62 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    final servers = ref.watch(serverListProvider);
+    final servers = ref.watch(serverListProvider).reversed.toList();
     final theme = Theme.of(context);
-
-    servers.reversed;
 
     return Scaffold(
       appBar: AppBar(title: Text('Scrcpy GUI Companion')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _addServer,
-        child: Icon(Icons.add),
+      // floatingActionButton: FloatingActionButton( // Removed in favor of BottomAppBar action
+      //   onPressed: _addServer,
+      //   tooltip: 'Add new server',
+      //   child: Icon(Icons.add),
+      // ),
+      bottomNavigationBar: BottomAppBar(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+          child: ElevatedButton.icon(
+            icon: Icon(Icons.add_circle_outline_rounded),
+            label: Text('Add Server'),
+            onPressed: _addServer,
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              textStyle: theme.textTheme.titleMedium,
+            ),
+          ),
+        ),
       ),
       body: CustomScrollView(
+        reverse: true,
         slivers: [
           if (servers.isEmpty && !loading)
             SliverFillRemaining(
-              child: Center(child: Text('No servers found.')),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.dns_outlined,
+                      size: 48,
+                      color: theme.colorScheme.onSurface.withAlpha(150),
+                    ),
+                    const SizedBox(height: 16),
+                    Text('No servers found.'),
+                  ],
+                ),
+              ),
             ),
           if (loading)
             SliverFillRemaining(
               child: Center(child: CircularProgressIndicator()),
             ),
-          if (servers.isNotEmpty)
+          if (servers.isNotEmpty) ...[
+            SliverToBoxAdapter(
+              child: Padding(padding: const EdgeInsets.only(bottom: 8)),
+            ),
             SliverList.builder(
               itemCount: servers.length,
               itemBuilder: (context, index) {
                 final serv = servers[index];
-                if (index == servers.length - 1) {
-                  return Column(
-                    children: [
-                      ServerListTile(serv: serv, ref: ref),
-                      Divider(endIndent: 10, indent: 10),
-                      Text(
-                        'Swipe left/right to delete server.',
-                      ).textColor(theme.colorScheme.onSurface.withAlpha(100)),
-                    ],
-                  );
-                }
-
                 return ServerListTile(
                   key: ValueKey(serv),
                   serv: serv,
@@ -83,6 +100,24 @@ class _MainPageState extends ConsumerState<MainPage> {
                 );
               },
             ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16.0,
+                  horizontal: 24.0,
+                ),
+                child: Center(
+                  child: Text(
+                    'Swipe left/right to delete server.',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurface.withAlpha(150),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -219,7 +254,10 @@ class _ServerListTileState extends ConsumerState<ServerListTile>
         ),
         child: ListTile(
           title: Text(widget.serv.name),
-          subtitle: Text('${widget.serv.ip}:${widget.serv.port}').fontSize(12),
+          subtitle: Text(
+            '${widget.serv.ip}:${widget.serv.port}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -243,12 +281,16 @@ class _ServerListTileState extends ConsumerState<ServerListTile>
               showDialog(
                 context: context,
                 builder:
-                    (context) => AlertDialog(
+                    (dialogContext) => AlertDialog(
+                      shape: RoundedRectangleBorder(
+                        // Added for consistency
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                       title: Text('Error'),
                       content: Text(e.toString()),
                       actions: [
                         TextButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () => Navigator.pop(dialogContext),
                           child: Text('OK'),
                         ),
                       ],

@@ -67,6 +67,41 @@ class _DevicePageState extends ConsumerState<DevicePage>
           ).fontSize(12),
           contentPadding: EdgeInsets.zero,
         ),
+        // The TabBar will be moved from here
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: TabBar(
+          dividerColor: Colors.transparent,
+          controller: _tabController,
+          indicatorSize: TabBarIndicatorSize.label,
+          indicator: BoxDecoration(
+            border: Border(
+              top: BorderSide(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2.0,
+              ),
+            ),
+          ),
+          tabs: const [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
+              child: Text('Pinned apps'),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
+              child: Text('Configs'),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
+              child: Text('Running'),
+            ),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        // The TabBar was previously here, in AppBar.bottom
+        /*
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -78,10 +113,7 @@ class _DevicePageState extends ConsumerState<DevicePage>
             Padding(padding: const EdgeInsets.all(8.0), child: Text('Running')),
           ],
         ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-
+        */
         children: [
           Padding(
             padding: EdgeInsets.only(top: 4),
@@ -117,6 +149,8 @@ class _ConfigTabState extends ConsumerState<ConfigTab> {
     final configs = ref.watch(configsProvider);
 
     return ListView.builder(
+      padding: EdgeInsets.only(bottom: 8),
+      reverse: true,
       itemCount: configs.length,
       itemBuilder: (context, index) {
         final config = configs[index];
@@ -159,6 +193,8 @@ class _PinnedAppsTabState extends ConsumerState<PinnedAppsTab> {
     }
 
     return ListView.builder(
+      padding: EdgeInsets.only(bottom: 8),
+      reverse: true,
       itemCount: pinnedApps.length,
       itemBuilder: (context, index) {
         final pinned = pinnedApps[index];
@@ -310,6 +346,7 @@ class _InstanceTabState extends ConsumerState<InstanceTab> {
             .toList();
 
     return CustomScrollView(
+      reverse: true,
       slivers: [
         if (loading)
           SliverFillRemaining(
@@ -319,7 +356,8 @@ class _InstanceTabState extends ConsumerState<InstanceTab> {
         if (instances.isEmpty && !loading)
           SliverFillRemaining(child: Center(child: Text('No running scrcpy.'))),
 
-        if (instances.isNotEmpty)
+        if (instances.isNotEmpty) ...[
+          SliverPadding(padding: EdgeInsets.only(bottom: 8)),
           SliverList.builder(
             itemCount: instances.length,
             itemBuilder: (context, index) {
@@ -351,6 +389,7 @@ class _InstanceTabState extends ConsumerState<InstanceTab> {
               );
             },
           ),
+        ],
       ],
     );
   }
