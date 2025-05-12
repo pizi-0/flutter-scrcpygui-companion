@@ -42,6 +42,7 @@ dependencies:
   flutter_slidable: ^4.0.0
   string_extensions: ^0.7.3
   encrypt_decrypt_plus: ^1.7.0
+  device_info_plus: ^11.4.0
 
 dev_dependencies:
   flutter_test:
