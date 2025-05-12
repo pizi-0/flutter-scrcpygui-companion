@@ -141,6 +141,9 @@ class _ServerPageState extends ConsumerState<ServerPage> {
   }
 
   _initServer() async {
+    bool isBlocked = false;
+    ErrorPayload? payload;
+
     server.socket.listen(
       (data) {
         final decoded = utf8.decode(data);
@@ -153,7 +156,15 @@ class _ServerPageState extends ConsumerState<ServerPage> {
         final res = ServerParser.parse(ref, serverPayload: serverPayload);
 
         if (res is ErrorPayload) {
+          isBlocked = res.message.toLowerCase().contains('blocked');
+          payload = res;
+
+          if (isBlocked) {
+            return;
+          }
+
           showDialog(
+            barrierDismissible: !isBlocked,
             context: context,
             builder:
                 (dialogContext) => AlertDialog(
@@ -164,7 +175,14 @@ class _ServerPageState extends ConsumerState<ServerPage> {
                   content: Text(res.message),
                   actions: [
                     TextButton(
-                      onPressed: () => Navigator.pop(dialogContext),
+                      onPressed:
+                          () =>
+                              isBlocked
+                                  ? Navigator.popUntil(
+                                    context,
+                                    (route) => route.isFirst,
+                                  )
+                                  : Navigator.pop(dialogContext),
                       child: Text('Ok'),
                     ),
                   ],
@@ -173,7 +191,49 @@ class _ServerPageState extends ConsumerState<ServerPage> {
         }
       },
       onDone: () {
+        ref.read(devicesProvider.notifier).update((state) => []);
         Navigator.popUntil(context, (route) => route.isFirst);
+
+        if (isBlocked) {
+          showDialog(
+            barrierDismissible: !isBlocked,
+            context: context,
+            builder:
+                (dialogContext) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  title: Text('Error'),
+                  content: Text(payload?.message ?? 'Unknown error.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text('Ok'),
+                    ),
+                  ],
+                ),
+          );
+          return;
+        } else {
+          showDialog(
+            barrierDismissible: !isBlocked,
+            context: context,
+            builder:
+                (dialogContext) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  title: Text('Diconnected'),
+                  content: Text('You have been disconnected by the server.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      child: Text('Ok'),
+                    ),
+                  ],
+                ),
+          );
+        }
       },
       onError: (e, t) {
         Navigator.popUntil(context, (route) => route.isFirst);
