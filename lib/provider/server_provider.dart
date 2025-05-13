@@ -29,15 +29,15 @@ class ServerListNotifier extends Notifier<List<ServerModel>> {
   }
 
   addServer(ServerModel server) {
-    state = [...state.where((s) => s.ip != server.ip), server];
+    state = [...state.where((s) => s.id != server.id), server];
   }
 
   removeServer(ServerModel server) {
-    state = state.where((element) => element.ip != server.ip).toList();
+    state = state.where((element) => element.id != server.id).toList();
   }
 
   updateServer(ServerModel server) {
-    state = state.map((e) => e.ip == server.ip ? server : e).toList();
+    state = state.map((e) => e.id == server.id ? server : e).toList();
   }
 }
 

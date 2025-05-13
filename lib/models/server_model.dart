@@ -2,12 +2,14 @@
 import 'dart:convert';
 
 class ServerModel {
+  final String id;
   final String name;
   final String ip;
   final String secret;
   final int port;
 
   ServerModel({
+    required this.id,
     required this.name,
     required this.ip,
     required this.secret,
@@ -20,8 +22,10 @@ class ServerModel {
     String? secret,
     int? port,
     bool? startOnLaunch,
+    String? id,
   }) {
     return ServerModel(
+      id: id ?? this.id,
       name: name ?? this.name,
       ip: ip ?? this.ip,
       secret: secret ?? this.secret,
@@ -31,6 +35,7 @@ class ServerModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'id': id,
       'name': name,
       'ip': ip,
       'secret': secret,
@@ -40,6 +45,7 @@ class ServerModel {
 
   factory ServerModel.fromMap(Map<String, dynamic> map) {
     return ServerModel(
+      id: map['id'] as String,
       name: map['name'] as String,
       ip: map['ip'] as String,
       secret: map['secret'] as String,
@@ -61,7 +67,8 @@ class ServerModel {
   bool operator ==(covariant ServerModel other) {
     if (identical(this, other)) return true;
 
-    return other.name == name &&
+    return other.id == id &&
+        other.name == name &&
         other.ip == ip &&
         other.secret == secret &&
         other.port == port;
@@ -69,6 +76,10 @@ class ServerModel {
 
   @override
   int get hashCode {
-    return name.hashCode ^ ip.hashCode ^ secret.hashCode ^ port.hashCode;
+    return id.hashCode ^
+        name.hashCode ^
+        ip.hashCode ^
+        secret.hashCode ^
+        port.hashCode;
   }
 }
