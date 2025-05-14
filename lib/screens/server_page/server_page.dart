@@ -9,6 +9,7 @@ import 'package:scrcpygui_companion/models/companion_server/client_payload.dart'
 import 'package:scrcpygui_companion/models/companion_server/data/device_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/error_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/instance_payload.dart';
+import 'package:scrcpygui_companion/utils/db.dart';
 import 'package:scrcpygui_companion/utils/server_payload_parser.dart';
 import 'package:scrcpygui_companion/utils/server_utils.dart';
 import 'package:string_extensions/string_extensions.dart';
@@ -237,6 +238,15 @@ class _ConnectWithIpDialogState extends ConsumerState<ConnectWithIpDialog> {
   bool loading = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ipController.text = await Db.getLastIpInput();
+      setState(() {});
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
@@ -304,6 +314,10 @@ class _ConnectWithIpDialogState extends ConsumerState<ConnectWithIpDialog> {
           payload: jsonEncode({'ip': ipController.text.trim()}),
         ),
       );
+
+      if (ipController.text.trim().isIpv4) {
+        await Db.saveLastIpInput(ipController.text.trim());
+      }
 
       Navigator.pop(context);
     } catch (e) {

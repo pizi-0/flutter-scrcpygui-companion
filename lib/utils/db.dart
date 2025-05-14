@@ -24,4 +24,14 @@ class Db {
     final serverList = servers.map((server) => server.toJson()).toList();
     await prefs.setStringList(PKEY_SERVER_LIST, serverList);
   }
+
+  static saveLastIpInput(String ip) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(PKEY_LAST_IP_INPUT, ip);
+  }
+
+  static Future<String> getLastIpInput() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(PKEY_LAST_IP_INPUT) ?? '';
+  }
 }
