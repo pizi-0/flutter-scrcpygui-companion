@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrcpygui_companion/models/companion_server/client_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/config_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/device_payload.dart';
+import 'package:scrcpygui_companion/models/companion_server/data/instance_payload.dart';
 import 'package:scrcpygui_companion/models/companion_server/data/pairs_payload.dart';
 import 'package:scrcpygui_companion/provider/data_provider.dart';
 import 'package:scrcpygui_companion/utils/server_utils.dart';
@@ -226,8 +227,9 @@ class _PinnedAppsListTileState extends State<PinnedAppsListTile> {
           payload: jsonEncode({'hash': widget.pinned.hash}),
         ),
       );
+      await Future.delayed(300.milliseconds);
     } finally {
-      setState(() => loading = false);
+      if (mounted) setState(() => loading = false);
     }
   }
 
@@ -290,6 +292,7 @@ class _ConfigListTileState extends State<ConfigListTile> {
                     }),
                   ),
                 );
+                await Future.delayed(300.milliseconds);
               } catch (e) {
                 debugPrint(e.toString());
               } finally {
@@ -321,8 +324,6 @@ class InstanceTab extends ConsumerStatefulWidget {
 }
 
 class _InstanceTabState extends ConsumerState<InstanceTab> {
-  bool loading = false;
-
   Timer? timer;
 
   @override
@@ -348,14 +349,6 @@ class _InstanceTabState extends ConsumerState<InstanceTab> {
     return CustomScrollView(
       reverse: true,
       slivers: [
-        if (loading)
-          SliverFillRemaining(
-            child: Center(child: CircularProgressIndicator()),
-          ),
-
-        if (instances.isEmpty && !loading)
-          SliverFillRemaining(child: Center(child: Text('No running scrcpy.'))),
-
         if (instances.isNotEmpty) ...[
           SliverPadding(padding: EdgeInsets.only(bottom: 8)),
           SliverList.builder(
@@ -370,27 +363,59 @@ class _InstanceTabState extends ConsumerState<InstanceTab> {
                 margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
-                  child: ListTile(
-                    title: Text(instance.name),
-                    trailing: IconButton(
-                      onPressed: () async {
-                        final server = ServerUtils();
-                        await server.sendMessage(
-                          ClientPayload(
-                            action: ClientAction.killScrcpy,
-                            payload: jsonEncode({'pid': instance.pid}),
-                          ),
-                        );
-                      },
-                      icon: Icon(Icons.stop_rounded),
-                    ),
-                  ),
+                  child: InstanceListTile(instance: instance),
                 ),
               );
             },
           ),
-        ],
+        ] else
+          SliverFillRemaining(child: Center(child: Text('No running scrcpy.'))),
       ],
+    );
+  }
+}
+
+class InstanceListTile extends StatefulWidget {
+  const InstanceListTile({super.key, required this.instance});
+
+  final InstancePayload instance;
+
+  @override
+  State<InstanceListTile> createState() => _InstanceListTileState();
+}
+
+class _InstanceListTileState extends State<InstanceListTile> {
+  bool _loading = false;
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(widget.instance.name),
+      trailing: IconButton(
+        onPressed: () async {
+          setState(() => _loading = true);
+          try {
+            final server = ServerUtils();
+            await server.sendMessage(
+              ClientPayload(
+                action: ClientAction.killScrcpy,
+                payload: jsonEncode({'pid': widget.instance.pid}),
+              ),
+            );
+            await Future.delayed(300.milliseconds);
+          } finally {
+            if (mounted) {
+              setState(() => _loading = false);
+            }
+          }
+        },
+        icon:
+            _loading
+                ? SizedBox.square(
+                  dimension: 20,
+                  child: CircularProgressIndicator(),
+                )
+                : Icon(Icons.stop_rounded),
+      ),
     );
   }
 }

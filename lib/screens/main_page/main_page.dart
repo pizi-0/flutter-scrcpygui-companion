@@ -196,6 +196,7 @@ class ServerListTile extends ConsumerStatefulWidget {
 class _ServerListTileState extends ConsumerState<ServerListTile>
     with SingleTickerProviderStateMixin {
   late SlidableController slidableController;
+  bool _loading = false;
 
   @override
   void initState() {
@@ -261,43 +262,58 @@ class _ServerListTileState extends ConsumerState<ServerListTile>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          trailing: Icon(Icons.chevron_right_rounded),
-          onTap: () async {
-            try {
-              final server = ServerUtils();
-              if (slidableController.ratio != 0.0) {
-                slidableController.close();
-                return;
-              }
+          trailing:
+              _loading
+                  ? SizedBox.square(
+                    dimension: 20,
+                    child: CircularProgressIndicator(),
+                  )
+                  : Icon(Icons.chevron_right_rounded),
+          onTap:
+              _loading
+                  ? null
+                  : () async {
+                    try {
+                      setState(() => _loading = true);
 
-              await server.connect(widget.serv);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ServerPage(server: widget.serv),
-                ),
-              );
-            } on Exception catch (e) {
-              showDialog(
-                context: context,
-                builder:
-                    (dialogContext) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        // Added for consistency
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      title: Text('Error'),
-                      content: Text(e.toString()),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(dialogContext),
-                          child: Text('OK'),
+                      final server = ServerUtils();
+                      if (slidableController.ratio != 0.0) {
+                        slidableController.close();
+                        return;
+                      }
+
+                      await server.connect(widget.serv);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ServerPage(server: widget.serv),
                         ),
-                      ],
-                    ),
-              );
-            }
-          },
+                      );
+                    } on Exception catch (e) {
+                      showDialog(
+                        context: context,
+                        builder:
+                            (dialogContext) => AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                // Added for consistency
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              title: Text('Error'),
+                              content: Text(e.toString()),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  child: Text('OK'),
+                                ),
+                              ],
+                            ),
+                      );
+                    } finally {
+                      if (mounted) {
+                        setState(() => _loading = false);
+                      }
+                    }
+                  },
         ),
       ),
     );

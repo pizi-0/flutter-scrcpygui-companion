@@ -176,14 +176,7 @@ class _ServerPageState extends ConsumerState<ServerPage> {
                   content: Text(res.message),
                   actions: [
                     TextButton(
-                      onPressed:
-                          () =>
-                              res.type != ErrorType.blocked
-                                  ? Navigator.popUntil(
-                                    context,
-                                    (route) => route.isFirst,
-                                  )
-                                  : Navigator.pop(dialogContext),
+                      onPressed: () => Navigator.pop(dialogContext),
                       child: Text('Ok'),
                     ),
                   ],
@@ -423,6 +416,7 @@ class _DeviceListTileState extends ConsumerState<DeviceListTile>
             overflow: TextOverflow.ellipsis, // Keep this
             style: Theme.of(context).textTheme.bodySmall, // Use theme style
           ),
+          trailing: Icon(Icons.chevron_right_rounded),
         ),
       ),
     );
