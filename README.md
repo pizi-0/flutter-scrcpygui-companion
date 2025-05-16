@@ -8,7 +8,7 @@
 > A companion app for my [Scrcpy GUI](https://github.com/pizi-0/flutter-scrcpygui), made purely to cater to my laziness to walk 2 feets to my table to start scrcpy. Probably not for most people.
 
 ## ✨ Key Features
-* Execute Scrcpy GUI commands remotely, such as:
+* Execute Scrcpy GUI commands from your devices, such as:
     * Start/stop scrcpy
     * Disconnect wireless devices
 
