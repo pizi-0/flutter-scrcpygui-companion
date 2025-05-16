@@ -3,6 +3,7 @@
 import 'package:encrypt_decrypt_plus/encrypt_decrypt/xor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:scrcpygui_companion/provider/server_provider.dart';
 import 'package:scrcpygui_companion/screens/server_page/server_page.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -24,11 +25,13 @@ class MainPage extends ConsumerStatefulWidget {
 class _MainPageState extends ConsumerState<MainPage> {
   bool loading = false;
   final ServerUtils server = ServerUtils();
+  String appversion = '';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _getAppVersion();
       await _getServerList();
       // final prefs = await SharedPreferences.getInstance();
       // prefs.remove(PKEY_SERVER_LIST);
@@ -41,7 +44,7 @@ class _MainPageState extends ConsumerState<MainPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Scrcpy GUI Companion')),
+      appBar: AppBar(title: Text('Scrcpy GUI Companion ($appversion)')),
       // floatingActionButton: FloatingActionButton( // Removed in favor of BottomAppBar action
       //   onPressed: _addServer,
       //   tooltip: 'Add new server',
@@ -121,6 +124,12 @@ class _MainPageState extends ConsumerState<MainPage> {
         ],
       ),
     );
+  }
+
+  _getAppVersion() async {
+    final info = await PackageInfo.fromPlatform();
+    appversion = info.version;
+    setState(() {});
   }
 
   _getServerList() async {
