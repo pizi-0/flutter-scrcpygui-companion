@@ -182,7 +182,7 @@ class _PinnedAppsTabState extends ConsumerState<PinnedAppsTab> {
     final List<PairsPayload> pinnedApps =
         ref
             .watch(pinnedAppProvider)
-            .where((p) => p.deviceId == widget.device.id)
+            .where((p) => p.deviceId == widget.device.serialNo)
             .toList();
 
     if (loading) {
@@ -200,7 +200,7 @@ class _PinnedAppsTabState extends ConsumerState<PinnedAppsTab> {
       itemBuilder: (context, index) {
         final pinned = pinnedApps[index];
 
-        return PinnedAppsListTile(pinned: pinned);
+        return PinnedAppsListTile(pinned: pinned, device: widget.device);
       },
     );
   }
@@ -208,7 +208,12 @@ class _PinnedAppsTabState extends ConsumerState<PinnedAppsTab> {
 
 class PinnedAppsListTile extends StatefulWidget {
   final PairsPayload pinned;
-  const PinnedAppsListTile({super.key, required this.pinned});
+  final DevicePayload device;
+  const PinnedAppsListTile({
+    super.key,
+    required this.pinned,
+    required this.device,
+  });
 
   @override
   State<PinnedAppsListTile> createState() => _PinnedAppsListTileState();
@@ -224,7 +229,10 @@ class _PinnedAppsListTileState extends State<PinnedAppsListTile> {
       await server.sendMessage(
         ClientPayload(
           action: ClientAction.startAppConfigPair,
-          payload: jsonEncode({'hash': widget.pinned.hash}),
+          payload: jsonEncode({
+            'hash': widget.pinned.hash,
+            'deviceId': widget.device.id,
+          }),
         ),
       );
       await Future.delayed(300.milliseconds);
