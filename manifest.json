@@ -1,6 +1,6 @@
 {
-    "name": "scrcpygui_site",
-    "short_name": "scrcpygui_site",
+    "name": "scrcpygui_companion",
+    "short_name": "scrcpygui_companion",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
